@@ -33,10 +33,12 @@ int main(int argc, char **argv){
   }
 
   while((bytes_read = read(src_fd, buffer, BUFFSIZE)) > 0){
-    write(dst_fd, buffer, bytes_read);
-    total_size += bytes_read;
+    int bytes_write = write(dst_fd, buffer, bytes_read);
+    if(bytes_read != bytes_write){
+      printf("Failed copying\n");
+        exit(EXIT_FAILURE);
+    }
   }
-  printf("%d\n", total_size);
   close(src_fd);
   close(dst_fd);
   return 0;
