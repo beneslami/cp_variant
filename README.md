@@ -24,7 +24,30 @@ The program operates using a daily open/read/write system calls. I measured elap
   2097152|  72  | 15279|  20007|
   4194304|  53  | 16091|  20788|
 
-As you may see in the table, there might be a high correlation between write systemcall and overall elapsed time. So I quantitatively calculated:
+As you may see in the table, there might be a high correlation between write system call and overall elapsed time. So I quantitatively calculated:
 
 **correlation(write, overall) = 0.99**
 ![picture](open_correlation.png)
+
+## mmap:
+Data for systemcalls which are used in mmap program are as below:
+
+|open	| lseek |	mmap	| memcpy |	munmep |	overall |
+|---|----|---|---|---|---|
+60|	13|	15|	31915|1457|	56940|
+50|	12|	18|	27439|1508|37238|
+49|	13|	15|	24594|3752|37515|
+70|	17|	16|	22565|1431|34492|
+47|	11|	14|	23598|1555|35421|
+58|	12|	14|	22684|1593|34944|
+51|	13|	13|	23444|1639|32533|
+According to above table, the amount of overall elapsed time depends on memcpy system call. So after calculating the amount of correlation, we have such output as below:
+
+**correlation(memcpy, overall) = 0.92**
+![picture](mmap_correlation.png)
+
+The reason to provide above data is to find out the bottle neck of each program. The overall elapsed time of open program directly relies on write function and chuck size. Each time I doubled chuck size, the overall elapsed time would decrease.
+
+According to below plot, we see that in a large chuck size, the performance of mmap and open programs are approximately the same.
+
+![picture](openVsmmap.png)
