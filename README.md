@@ -23,3 +23,7 @@ The program operates using a daily open/read/write system calls. I measured elap
   1048576|  45  | 14612|  18985|
   2097152|  72  | 15279|  20007|
   4194304|  53  | 16091|  20788|
+
+As you may see in the table, there might be a high correlation between write systemcall and overall elapsed time. So I quantitatively calculated:
+
++ correlation(write, overall) = 0.99
