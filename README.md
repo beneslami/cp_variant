@@ -41,6 +41,7 @@ Data for systemcalls which are used in mmap program are as below:
 47|	11|	14|	23598|1555|35421|
 58|	12|	14|	22684|1593|34944|
 51|	13|	13|	23444|1639|32533|
+
 According to above table, the amount of overall elapsed time depends on memcpy system call. So after calculating the amount of correlation, we have such output as below:
 
 **correlation(memcpy, overall) = 0.92**
