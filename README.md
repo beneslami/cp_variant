@@ -26,4 +26,5 @@ The program operates using a daily open/read/write system calls. I measured elap
 
 As you may see in the table, there might be a high correlation between write systemcall and overall elapsed time. So I quantitatively calculated:
 
-+ correlation(write, overall) = 0.99
+**correlation(write, overall) = 0.99**
+![picture](open_correlation.png)
