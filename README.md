@@ -30,7 +30,7 @@ As you may see in the table, there might be a high correlation between write sys
 ![picture](open_correlation.png)
 
 ## mmap:
-Data for systemcalls which are used in mmap program are as below:
+Data for system calls which are used in mmap program are as below:
 
 |open	| lseek |	mmap	| memcpy |	munmep |	overall |
 |---|----|---|---|---|---|
