@@ -78,7 +78,7 @@ It seems like we can eliminate un-unnecessary copies by means of using mmap() sy
 
 But as a general principle in real life, there is no free lunch! while mmap does avoid that extra copy, it doesn’t guarantee the code will always be faster since it needs to find the space and maintain it in the TLB and make sure to flush it after unmapping and page fault gets much more expensive since kernel now needs to read from the disk to update the memory space and TLB.
 
-![picture](reports/mmap.png)
+![picture](reports/mmap1.png)
 
 * Step one: the mmap() system call causes the file contents to be copied into a kernel buffer by the DMA engine. The buffer is shared then with the user process, without any copy being performed between the kernel and user memory spaces.
 
