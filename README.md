@@ -71,6 +71,16 @@ The top side shows context switches, and the bottom side shows copy operations.
 
 * Step four: the write system call returns, creating our fourth context switch. Independently and asynchronously, a fourth copy happens as the DMA engine passes the data from the kernel buffer to disk.
 
-It seems like we can eliminate un-unnecessary copies by means of using mmap() system call. And we expect better performance. Mmap allows code to map file to kernel memory and access that directly as if it were in the application user space, thus avoiding the unnecessary copy. As a tradeoff, that will still involve **4 context switches**. But since OS maps certain chunk of file into memory, you get all benefits from OS virtual memory management.
+It seems like we can eliminate un-unnecessary copies by means of using mmap() system call. And we expect better performance. Mmap allows code to map file to kernel memory and access that directly as if it were in the application user space, thus avoiding the unnecessary copies. As a tradeoff, that will still involve **4 context switches**. But since OS maps certain chunk of file into memory, you get all benefits from OS virtual memory management.
 
 ![picture](reports/mmap_um.png)
+
+But as a general principle in real life, there is no free lunch! while mmap does avoid that extra copy, it doesn’t guarantee the code will always be faster since it needs to find the space and maintain it in the TLB and make sure to flush it after unmapping and page fault gets much more expensive since kernel now needs to read from the disk to update the memory space and TLB.
+
+![picture](reports/mmap.png)
+
+* Step one: the mmap() system call causes the file contents to be copied into a kernel buffer by the DMA engine. The buffer is shared then with the user process, without any copy being performed between the kernel and user memory spaces.
+
+* Step two: the memcpy() system call causes the kernel to copy the data from the original kernel buffers into the kernel buffers associated with the other file.
+
+* Step three: the third copy happens as the DMA engine passes the data from the kernel buffer associated with the other file to the disk.
