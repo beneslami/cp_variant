@@ -45,10 +45,18 @@ Data for system calls which are used in mmap program are as below:
 According to above table, the amount of overall elapsed time depends on memcpy system call. So after calculating the amount of correlation, we have such output as below:
 
 **correlation(memcpy, overall) = 0.92**
-![picture](mmap_correlation.png)
+![picture](reports/mmap_correlation.png)
 
 The reason to provide above data is to find out the bottle neck of each program. The overall elapsed time of open program directly relies on write function and chuck size. Each time I doubled chuck size, the overall elapsed time would decrease.
 
 According to below plot, we see that in a large chuck size, the performance of mmap and open programs are approximately the same.
 
-![picture](openVsmmap.png)
+![picture](reports/openVsmmap.png)
+---
+Here is what happens when we run open program:
+
+![picture](reports/open_um.png)
+
+If throughput and latency are bottleneck, this program is annoying. There are **4 context switches** and **2 unnecessary copies** as it is illustrated below:
+
+![picture](reports/open.png)
