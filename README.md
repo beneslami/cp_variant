@@ -60,3 +60,13 @@ Here is what happens when we run open program:
 If throughput and latency are bottleneck, this program is annoying. There are **4 context switches** and **2 unnecessary copies** as it is illustrated below:
 
 ![picture](reports/open.png)
+
+The top side shows context switches, and the bottom side shows copy operations.
+
+* Step one: the read() system call causes a context switch from user mode to kernel mode. The first copy is performed by the DMA engine, which reads file contents from the disk and stores them into a kernel address space buffer.
+
+* Step two: data is copied from the kernel buffer into the user buffer, and the read() system call returns. The return from the call caused a context switch from kernel back to user mode. Now the data is stored in the user address space buffer, and it can begin its way down again.
+
+* Step three: the write() system call causes a context switch from user mode to kernel mode. A third copy is performed to put the data into a kernel address space buffer again. This time, though, the data is put into a different buffer, a buffer that is associated with another opened file specifically.
+
+* Step four: the write system call returns, creating our fourth context switch. Independently and asynchronously, a fourth copy happens as the DMA engine passes the data from the kernel buffer to disk.
