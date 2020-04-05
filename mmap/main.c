@@ -6,8 +6,8 @@
 #include <sys/time.h>
 #include <sys/mman.h>
 
-#define BUFFSIZE 8192
-#define PAGESIZE 4096
+#define BUFFSIZE 65536
+#define PAGESIZE 12288
 
 int main(int argc, char **argv){
   char *source, *destination;
@@ -18,12 +18,6 @@ int main(int argc, char **argv){
   int overall_time = 0;
   int offset = 0;
 
-  /*
-  gettimeofday(&start, NULL);
-  gettimeofday(&end, NULL);
-  overall_time += (end.tv_usec - start.tv_usec);
-  printf("open = %d\n", (end.tv_usec - start.tv_usec));
-  */
   if(argc < 3){
     printf("copy <source> <destination>\n");
     exit(EXIT_FAILURE);
@@ -46,19 +40,20 @@ int main(int argc, char **argv){
   }
   lseek(dst_fd, bytes_read -1, SEEK_SET);
   write(dst_fd, "", 1);
+
   int maximum = bytes_read/BUFFSIZE;
   int i = 0;
   float percent = ((float)(i)/maximum)*100;
-  //gettimeofday(&start, NULL);
 
+  gettimeofday(&start, NULL);
   while(bytes_read > 0){
-    printf("%.2f\n", percent);
+    //printf("%.2f\n", percent);
     if(bytes_read < BUFFSIZE){
       bytes = bytes_read;
       bytes_read = 0;
     }
     else{
-      bytes_read -= BUFFSIZE;
+      bytes_read -= bytes;
     }
 
     void *src_map = mmap(NULL, bytes, PROT_READ, MAP_SHARED, src_fd, offset);
@@ -86,12 +81,12 @@ int main(int argc, char **argv){
       exit(EXIT_FAILURE);
     }
     offset += PAGESIZE;
-    i++;
-    percent = ((float)(i)/maximum)*100;
-    system("clear");
+    //i++;
+    //percent = ((float)(i)/maximum)*100;
+    //system("clear");
   }
-  //gettimeofday(&end, NULL);
-  //printf("overall = %d\n", (end.tv_usec - start.tv_usec));
+  gettimeofday(&end, NULL);
+  printf("overall = %d\n", (end.tv_usec - start.tv_usec));
   close(src_fd);
   close(dst_fd);
 
