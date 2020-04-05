@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 
-#define BUFFSIZE 8192
+#define BUFFSIZE 1048576
 #define EVALUATE 0
 
 int main(int argc, char **argv){
@@ -49,9 +49,9 @@ int main(int argc, char **argv){
     perror("dst_fd");
     exit(EXIT_FAILURE);
   }
-#if EVALUATE
+//#if EVALUATE
   gettimeofday(&start, NULL);
-#endif
+//#endif
   while((bytes_read = read(src_fd, buffer, BUFFSIZE)) > 0){
     int bytes_write = write(dst_fd, buffer, bytes_read);
     if(bytes_read != bytes_write){
@@ -59,11 +59,12 @@ int main(int argc, char **argv){
         exit(EXIT_FAILURE);
     }
   }
-#if EVALUATE
+//#if EVALUATE
   gettimeofday(&end, NULL);
-  overall_time += (end.tv_usec - start.tv_usec);
-  printf("write = %d\n", (end.tv_usec - start.tv_usec));
-#endif
+  printf("overall = %ld.%ld\n", (long int)(end.tv_sec - start.tv_sec), (long int)(end.tv_usec - start.tv_usec)/1000);
+  //overall_time += (end.tv_usec - start.tv_usec);
+  //printf("write = %d\n", (end.tv_usec - start.tv_usec));
+//#endif
 #if EVALUATE
   gettimeofday(&start, NULL);
 #endif

@@ -6,8 +6,7 @@
 #include <sys/time.h>
 #include <sys/mman.h>
 
-#define BUFFSIZE (1048576)
-#define PAGESIZE (1048576)
+#define BUFFSIZE 4096*256
 
 int main(int argc, char **argv){
   char *source, *destination;
@@ -79,7 +78,8 @@ int main(int argc, char **argv){
     offset += bytes;
   }
   gettimeofday(&end, NULL);
-  printf("overall = %d\n", (end.tv_usec - start.tv_usec));
+  printf("overall = %ld.%ld\n", (long int)(end.tv_sec - start.tv_sec), (long int)(end.tv_usec - start.tv_usec)/1000);
+
   close(src_fd);
   close(dst_fd);
 
