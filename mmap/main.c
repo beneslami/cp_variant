@@ -6,15 +6,24 @@
 #include <sys/time.h>
 #include <sys/mman.h>
 
-#define EVALUATE 0
+#define BUFFSIZE 8192
+#define PAGESIZE 4096
 
 int main(int argc, char **argv){
   char *source, *destination;
   int src_fd, dst_fd;
-  size_t bytes_read;
+  unsigned int bytes_read;
+  int bytes = BUFFSIZE;
   struct timeval start, end;
   int overall_time = 0;
+  int offset = 0;
 
+  /*
+  gettimeofday(&start, NULL);
+  gettimeofday(&end, NULL);
+  overall_time += (end.tv_usec - start.tv_usec);
+  printf("open = %d\n", (end.tv_usec - start.tv_usec));
+  */
   if(argc < 3){
     printf("copy <source> <destination>\n");
     exit(EXIT_FAILURE);
@@ -22,116 +31,69 @@ int main(int argc, char **argv){
 
   source = argv[1];
   destination = argv[2];
-#if EVALUATE
-  gettimeofday(&start, NULL);
-#endif
-  src_fd = open(source, O_RDONLY, 0777);
-#if EVALUATE
-  gettimeofday(&end, NULL);
-  overall_time += (end.tv_usec - start.tv_usec);
-  printf("open = %d\n", (end.tv_usec - start.tv_usec));
-#endif
 
+  src_fd = open(source, O_RDONLY, 0777);
   if(src_fd < 0){
     perror("src_fd");
     exit(EXIT_FAILURE);
   }
-#if EVALUATE
-  gettimeofday(&start, NULL);
-#endif
   bytes_read = lseek(src_fd, 0, SEEK_END);
-#if EVALUATE
-  gettimeofday(&end, NULL);
-  overall_time += (end.tv_usec - start.tv_usec);
-  printf("lseek = %d\n", (end.tv_usec - start.tv_usec));
-#endif
-#if EVALUATE
-  gettimeofday(&start, NULL);
-#endif
-  void *src_map = mmap(NULL, bytes_read, PROT_READ, MAP_SHARED, src_fd, 0);
-#if EVALUATE
-  gettimeofday(&end, NULL);
-  overall_time += (end.tv_usec - start.tv_usec);
-  printf("mmap = %d\n", (end.tv_usec - start.tv_usec));
-#endif
 
-  if(src_map == (void*) -1){
-    perror("src_map");
-    exit(EXIT_FAILURE);
-  }
-#if EVALUATE
-  gettimeofday(&start, NULL);
-#endif
   dst_fd = open(destination, O_RDWR | O_CREAT, 0777);
-#if EVALUATE
-  gettimeofday(&end, NULL);
-  overall_time += (end.tv_usec - start.tv_usec);
-  printf("open = %d\n", (end.tv_usec - start.tv_usec));
-#endif
   if(dst_fd < 0){
     perror("dst_fd");
     exit(EXIT_FAILURE);
   }
-#if EVALUATE
-  gettimeofday(&start, NULL);
-#endif
   lseek(dst_fd, bytes_read -1, SEEK_SET);
-#if EVALUATE
-  gettimeofday(&end, NULL);
-  overall_time += (end.tv_usec - start.tv_usec);
-  printf("lseek = %d\n", (end.tv_usec - start.tv_usec));
-#endif
-#if EVALUATE
-  gettimeofday(&start, NULL);
-#endif
-  write(dst_fd, "\0", 1);
-#if EVALUATE
-  gettimeofday(&end, NULL);
-  overall_time += (end.tv_usec - start.tv_usec);
-  printf("write = %d\n", (end.tv_usec - start.tv_usec));
-#endif
-#if EVALUATE
-  gettimeofday(&start, NULL);
-#endif
-  void *dst_map = mmap(NULL, bytes_read, PROT_WRITE, MAP_SHARED, dst_fd, 0);
-#if EVALUATE
-  gettimeofday(&end, NULL);
-  overall_time += (end.tv_usec - start.tv_usec);
-  printf("mmap = %d\n", (end.tv_usec - start.tv_usec));
-#endif
-  if(dst_map == (void*) -1){
-    perror("dst_map");
-    exit(EXIT_FAILURE);
+  write(dst_fd, "", 1);
+  int maximum = bytes_read/BUFFSIZE;
+  int i = 0;
+  float percent = ((float)(i)/maximum)*100;
+  //gettimeofday(&start, NULL);
+
+  while(bytes_read > 0){
+    printf("%.2f\n", percent);
+    if(bytes_read < BUFFSIZE){
+      bytes = bytes_read;
+      bytes_read = 0;
+    }
+    else{
+      bytes_read -= BUFFSIZE;
+    }
+
+    void *src_map = mmap(NULL, bytes, PROT_READ, MAP_SHARED, src_fd, offset);
+    if(src_map == (void*) MAP_FAILED){
+      perror("src_map");
+      exit(EXIT_FAILURE);
+    }
+
+    void *dst_map = mmap(NULL, bytes, PROT_WRITE, MAP_SHARED, dst_fd, offset);
+    if(dst_map == (void*) MAP_FAILED){
+      perror("dst_map");
+      exit(EXIT_FAILURE);
+    }
+
+    memcpy(dst_map, src_map, bytes);
+
+    int src_unmp = munmap(src_map, bytes);
+    if(src_unmp == -1){
+      perror("src_unmap");
+      exit(EXIT_FAILURE);
+    }
+    int dst_unmp = munmap(dst_map, bytes);
+    if(dst_unmp == -1){
+      perror("dst_unmap");
+      exit(EXIT_FAILURE);
+    }
+    offset += PAGESIZE;
+    i++;
+    percent = ((float)(i)/maximum)*100;
+    system("clear");
   }
-#if EVALUATE
-  gettimeofday(&start, NULL);
-#endif
-  memcpy(dst_map, src_map, bytes_read);
-#if EVALUATE
-  gettimeofday(&end, NULL);
-  overall_time += (end.tv_usec - start.tv_usec);
-  printf("memcpy = %d\n", (end.tv_usec - start.tv_usec));
-#endif
-#if EVALUATE
-  gettimeofday(&start, NULL);
-#endif
-  munmap(src_map, bytes_read);
-  munmap(dst_map, bytes_read);
-#if EVALUATE
-  gettimeofday(&end, NULL);
-  overall_time += (end.tv_usec - start.tv_usec);
-  printf("munmap = %d\n", (end.tv_usec - start.tv_usec));
-#endif
-#if EVALUATE
-  gettimeofday(&start, NULL);
-#endif
+  //gettimeofday(&end, NULL);
+  //printf("overall = %d\n", (end.tv_usec - start.tv_usec));
   close(src_fd);
   close(dst_fd);
-#if EVALUATE
-  gettimeofday(&end, NULL);
-  overall_time += (end.tv_usec - start.tv_usec);
-  printf("close = %d\n", (end.tv_usec - start.tv_usec));
-  printf("overall time elapsed = %d\n", overall_time);
-#endif
+
   return 0;
 }
