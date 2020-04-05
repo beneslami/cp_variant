@@ -6,14 +6,13 @@
 #include <sys/time.h>
 #include <sys/mman.h>
 
-#define BUFFSIZE 65536
-#define PAGESIZE 12288
+#define BUFFSIZE (1048576)
+#define PAGESIZE (1048576)
 
 int main(int argc, char **argv){
   char *source, *destination;
   int src_fd, dst_fd;
   unsigned int bytes_read;
-  int bytes = BUFFSIZE;
   struct timeval start, end;
   int overall_time = 0;
   int offset = 0;
@@ -23,8 +22,8 @@ int main(int argc, char **argv){
     exit(EXIT_FAILURE);
   }
 
-  source = argv[1];
-  destination = argv[2];
+  source = argv[1];       /* source file */
+  destination = argv[2];  /* Destiniation file */
 
   src_fd = open(source, O_RDONLY, 0777);
   if(src_fd < 0){
@@ -41,14 +40,11 @@ int main(int argc, char **argv){
   lseek(dst_fd, bytes_read -1, SEEK_SET);
   write(dst_fd, "", 1);
 
-  int maximum = bytes_read/BUFFSIZE;
-  int i = 0;
-  float percent = ((float)(i)/maximum)*100;
+  int bytes = BUFFSIZE;
 
   gettimeofday(&start, NULL);
   while(bytes_read > 0){
-    //printf("%.2f\n", percent);
-    if(bytes_read < BUFFSIZE){
+    if(bytes_read < bytes){
       bytes = bytes_read;
       bytes_read = 0;
     }
@@ -80,10 +76,7 @@ int main(int argc, char **argv){
       perror("dst_unmap");
       exit(EXIT_FAILURE);
     }
-    offset += PAGESIZE;
-    //i++;
-    //percent = ((float)(i)/maximum)*100;
-    //system("clear");
+    offset += bytes;
   }
   gettimeofday(&end, NULL);
   printf("overall = %d\n", (end.tv_usec - start.tv_usec));
@@ -92,3 +85,11 @@ int main(int argc, char **argv){
 
   return 0;
 }
+
+
+/* Fancy piece of code to percentize the operaton!!!
+int maximum = bytes_read/BUFFSIZE;
+int i = 0;
+float percent = ((float)(i)/maximum)*100;
+printf("%.2f\n", percent);
+*/
