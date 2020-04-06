@@ -27,7 +27,6 @@ The below tables is the overall elapsed time comparison between usual open/write
 |155MB | |
 |------|--|		
 |chuck size |	mmap/memcpy|
-|------|-----|
 4096*1 |	0.537	0.922 |
 4096*2 |	0.576	0.528 |
 4096*4 |	0.267	0.562 |
@@ -41,7 +40,7 @@ The below tables is the overall elapsed time comparison between usual open/write
 4096*256 |	0.237	0.409 |
 4096*512 |	0.196	0.4 |
 4096*1024 |	0.216	0.363 |
-|------|-----|
+
 
 ![picture](reports/155MB.png)
 ---
