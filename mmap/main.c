@@ -6,7 +6,7 @@
 #include <sys/time.h>
 #include <sys/mman.h>
 
-#define BUFFSIZE 4096*1
+#define BUFFSIZE 4096*1024
 
 int main(int argc, char **argv){
   char *source, *destination;

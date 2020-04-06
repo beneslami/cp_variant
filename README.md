@@ -1,58 +1,48 @@
 # cp_variant
 two variants of a file copy program
 
-## open:
-The program operates using a daily open/read/write system calls. I measured elapsed time for each system call and calculate overall elapsed time. The extracted data is as below table:
 
-|Chuck Size| open | write | overall |
-|----------|------|-------|---------|
-  64    |   53 |  148602 | 152866|
-  128   |   69  |620220 | 624496|
-  256   |   62  |373219 | 377616|
-  512   |   52  | 221955| 226341|
-  1024  |   95  | 162260| 166678|
-  2048  |   53  | 118529| 122987|
-  4096  |   54  | 104302| 108688|
-  8192  |   94  | 69275|  73773|
-  16384 |   74  | 44933|  49712|
-  32768 |   49  | 29641|  34209|
-  65536 |   49  | 25324|  29755|
-  131072|   63  | 18946|  23879|
-  262144|   58  | 18173|  23175|
-  524288|   81  | 14188|  23722|
-  1048576|  45  | 14612|  18985|
-  2097152|  72  | 15279|  20007|
-  4194304|  53  | 16091|  20788|
+The below tables is the overall elapsed time comparison between usual open/write and mmap/memcpy programs. The first table is for transferring 1.6GB of data, and the second one is for transferring 155MB of data.
 
-As you may see in the table, there might be a high correlation between write system call and overall elapsed time. So I quantitatively calculated:
+|   1.6GB  |
+|----------|
+|Chuck Size| read/write | mmap/memcpy|
+|----------|------|---------|
+4096*1 |	4.566 |	9.503 |
+4096*2 |	2.808 |	6.767 |
+4096*4 |	2.592 |	5.889 |
+4096*6 |	2.404 |	5.195 |
+4096*8 |	2.232 |	4.93 |
+4096*10 |	2.251 |	4.849 |
+4096*20 |	2.31 |	4.334 |
+4096*40 |	2.18 |	4.363 |
+4096*80 |	2.135 |	3.953 |
+4096*128 |	2.116 |	4.029 |
+4096*256 |	2.174 |	4.132 |
+4096*512 |	2.348 |	3.404 |
+4096*1024 |	2.099 |	3.235 |
 
-**correlation(write, overall) = 0.99**
+![picture](reports/1.6GB.png)
 
-![picture](open_correlation.png)
+|155MB |
+|------|		
+|chuck size |	mmap/memcpy|
+|------|-----|
+4096*1 |	0.537	0.922 |
+4096*2 |	0.576	0.528 |
+4096*4 |	0.267	0.562 |
+4096*6 |	0.261	0.547 |
+4096*8 |	0.232	0.492 |
+4096*10 |	0.221	0.447 |
+4096*20 |	0.248	0.463 |
+4096*40 |	0.229	0.436 |
+4096*80 |	0.236	0.423 |
+4096*128 |	0.237	0.428 |
+4096*256 |	0.237	0.409 |
+4096*512 |	0.196	0.4 |
+4096*1024 |	0.216	0.363 |
 
-## mmap:
-Data for system calls which are used in mmap program are as below:
-
-|open	| lseek |	mmap	| memcpy |	munmep |	overall |
-|---|----|---|---|---|---|
-60|	13|	15|	31915|1457|	56940|
-50|	12|	18|	27439|1508|37238|
-49|	13|	15|	24594|3752|37515|
-70|	17|	16|	22565|1431|34492|
-47|	11|	14|	23598|1555|35421|
-58|	12|	14|	22684|1593|34944|
-51|	13|	13|	23444|1639|32533|
-
-According to above table, the amount of overall elapsed time depends on memcpy system call. So after calculating the amount of correlation, we have such output as below:
-
-**correlation(memcpy, overall) = 0.92**
-![picture](reports/mmap_correlation.png)
-
-The reason to provide above data is to find out the bottle neck of each program. The overall elapsed time of open program directly relies on write function and chuck size. Each time I doubled chuck size, the overall elapsed time would decrease.
-
-According to below plot, we see that in a large chuck size, the performance of mmap and open programs are approximately the same.
-
-![picture](reports/openVsmmap.png)
+![picture](reports/155MB.png)
 ---
 Here is what happens when we run open program:
 
