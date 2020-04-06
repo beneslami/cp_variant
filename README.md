@@ -24,8 +24,8 @@ The below tables is the overall elapsed time comparison between usual open/write
 
 ![picture](reports/1.6GB.png)
 
-|155MB |
-|------|		
+|155MB | |
+|------|--|		
 |chuck size |	mmap/memcpy|
 |------|-----|
 4096*1 |	0.537	0.922 |
