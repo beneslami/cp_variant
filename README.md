@@ -4,10 +4,9 @@ two variants of a file copy program
 
 The below tables is the overall elapsed time comparison between usual open/write and mmap/memcpy programs. The first table is for transferring 1.6GB of data, and the second one is for transferring 155MB of data.
 
-|   1.6GB  |
+|   1.6GB  |||
 |----------|
 |Chuck Size| read/write | mmap/memcpy|
-|----------|------|---------|
 4096*1 |	4.566 |	9.503 |
 4096*2 |	2.808 |	6.767 |
 4096*4 |	2.592 |	5.889 |
@@ -24,22 +23,22 @@ The below tables is the overall elapsed time comparison between usual open/write
 
 ![picture](reports/1.6GB.png)
 
-|155MB | |
-|------|--|		
-|chuck size |	mmap/memcpy|
-4096*1 |	0.537	0.922 |
-4096*2 |	0.576	0.528 |
-4096*4 |	0.267	0.562 |
-4096*6 |	0.261	0.547 |
-4096*8 |	0.232	0.492 |
-4096*10 |	0.221	0.447 |
-4096*20 |	0.248	0.463 |
-4096*40 |	0.229	0.436 |
-4096*80 |	0.236	0.423 |
-4096*128 |	0.237	0.428 |
-4096*256 |	0.237	0.409 |
-4096*512 |	0.196	0.4 |
-4096*1024 |	0.216	0.363 |
+|155MB ||
+|------|||		
+|Chuck Size| read/write | mmap/memcpy|
+4096*1 |	0.537 |	0.922 |
+4096*2 |	0.576 |	0.528 |
+4096*4 |	0.267 |	0.562 |
+4096*6 |	0.261 |	0.547 |
+4096*8 |	0.232 |	0.492 |
+4096*10 |	0.221 |	0.447 |
+4096*20 |	0.248 |	0.463 |
+4096*40 |	0.229 |	0.436 |
+4096*80 |	0.236 |	0.423 |
+4096*128 |	0.237 |	0.428 |
+4096*256 |	0.237 |	0.409 |
+4096*512 |	0.196 |	0.4 |
+4096*1024 |	0.216 |	0.363 |
 
 
 ![picture](reports/155MB.png)
