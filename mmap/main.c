@@ -6,7 +6,7 @@
 #include <sys/time.h>
 #include <sys/mman.h>
 
-#define BUFFSIZE 4096*256
+#define BUFFSIZE 4096*1024
 
 int main(int argc, char **argv){
   char *source, *destination;
@@ -65,12 +65,12 @@ int main(int argc, char **argv){
 
     memcpy(dst_map, src_map, bytes);
 
-    int src_unmp = munmap(src_map, bytes);
+    int src_unmp = msync(src_map, bytes, MS_INVALIDATE);
     if(src_unmp == -1){
       perror("src_unmap");
       exit(EXIT_FAILURE);
     }
-    int dst_unmp = munmap(dst_map, bytes);
+    int dst_unmp = msync(dst_map, bytes, MS_INVALIDATE);
     if(dst_unmp == -1){
       perror("dst_unmap");
       exit(EXIT_FAILURE);
