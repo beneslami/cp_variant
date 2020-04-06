@@ -6,7 +6,7 @@
 #include <sys/time.h>
 #include <sys/mman.h>
 
-#define BUFFSIZE 4096*1024
+#define BUFFSIZE 4096*1
 
 int main(int argc, char **argv){
   char *source, *destination;
@@ -41,7 +41,6 @@ int main(int argc, char **argv){
 
   int bytes = BUFFSIZE;
 
-  gettimeofday(&start, NULL);
   while(bytes_read > 0){
     if(bytes_read < bytes){
       bytes = bytes_read;
@@ -65,20 +64,18 @@ int main(int argc, char **argv){
 
     memcpy(dst_map, src_map, bytes);
 
-    int src_unmp = msync(src_map, bytes, MS_INVALIDATE);
+    int src_unmp = munmap(src_map, bytes);
     if(src_unmp == -1){
       perror("src_unmap");
       exit(EXIT_FAILURE);
     }
-    int dst_unmp = msync(dst_map, bytes, MS_INVALIDATE);
+    int dst_unmp = munmap(dst_map, bytes);
     if(dst_unmp == -1){
       perror("dst_unmap");
       exit(EXIT_FAILURE);
     }
     offset += bytes;
   }
-  gettimeofday(&end, NULL);
-  printf("overall = %ld.%ld\n", (long int)(end.tv_sec - start.tv_sec), (long int)(end.tv_usec - start.tv_usec)/1000);
 
   close(src_fd);
   close(dst_fd);
